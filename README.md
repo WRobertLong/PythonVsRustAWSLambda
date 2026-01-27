@@ -1,16 +1,31 @@
 # PythonVsRustAWSLambda
+
 Testing the runtime difference between Python and Rust for AWS Lambda.
 
-All AWS Lambda's must include a handler function `lambda_handler`, this is what
-the lambda runtime will call be default. 
+This repo contains two example Lambdas:
+- `pythonLambda/` — Python implementation
+- `rustLambda/` — Rust implementation
 
-When triggering these lambdas off an s3 event, it's important to note more
-than one event might run though that lambda invocation, hence the
-inital loop.
+The Lambdas are intended to be triggered by an S3 event. Note that an S3-triggered invocation can contain multiple records, so the handler typically loops over the incoming event records.
 
-See the full blog post here https://www.confessionsofadataguy.com/aws-lambdas-python-vs-rust-performance-and-cost-savings/
+See the full write-up:
+https://www.confessionsofadataguy.com/aws-lambdas-python-vs-rust-performance-and-cost-savings/
 
-`Rust` lambda.
-You will need to add the crate `cargo-lambda`. It helps you package and build
-the bootstrip binary needed for deployment.
-To build the `bootstrap.zip` that your Rust AWS Lambda needs, run `cargo lambda build --release --output-format zip`
+## What this benchmark does (high level)
+
+At a high level, both Lambdas:
+1. Receive an S3 event
+2. For each record in the event, read the referenced object
+3. Perform the same workload in Python vs Rust
+4. Log timing information so the runtimes can be compared
+
+(For exact details, see the implementation in each language folder.)
+
+## Quick start: Rust Lambda build (cargo-lambda)
+
+The Rust Lambda uses `cargo-lambda` to build and package the `bootstrap` binary required for deployment.
+
+Install cargo-lambda (see the cargo-lambda docs for platform-specific instructions), then build the deployment zip:
+
+```bash
+cargo lambda build --release --output-format zip
